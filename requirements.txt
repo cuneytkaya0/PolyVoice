@@ -1,0 +1,10 @@
+Flask==3.1.3
+kokoro @ https://github.com/semidark/kokoro/archive/b96fef95e6a746495f92443fac7c688f90fc57fc.zip
+misaki[en,zh,de] @ https://github.com/semidark/misaki/archive/9cda9268309160120fffee216280a9ca83ac4644.zip
+phonemizer-fork==3.3.2
+espeakng-loader==0.2.4
+pyopenjtalk-plus==0.4.1.post9
+numpy==2.5.4
+soundfile==0.14.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu

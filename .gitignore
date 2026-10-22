@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+dist/
+site/
+*.egg-info/
+.eggs/
+
+# Virtual environments and local tooling
+.venv/
+.venv.failed-migration/
+.python/
+.tools/
+venv/
+env/
+.env
+.env.*
+!.env.example
+.uv-cache/
+.pip-cache/
+.tmp/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Downloaded models, voice packs, and generated speech
+models/
+weights/
+voices/
+outputs/
+output/
+generated/
+previews/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.wav
+*.mp3
+*.flac
+
+# Logs and runtime files
+*.log
+*.pid
+instance/
+*.sqlite3
+*.db
+*.tmp
+*.temp
+
+# Secrets and local system files
+.secrets/
+secrets.*
+!.secrets.example
+.envrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.ppk
+id_rsa
+id_ed25519
+known_hosts
+credentials.json
+token.json
+cookies.sqlite
+cookies.sqlite3
+Login Data
+Local State
+*.pdf
+*.doc
+*.docx
+*.odt
+*.rtf
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.txt
+!requirements.txt
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*.swo
+
+# Editors
+.idea/
+.vscode/

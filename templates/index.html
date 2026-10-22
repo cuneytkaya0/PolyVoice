@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111214">
+  <title>PolyVoice — Local Text to Speech</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="PolyVoice home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>poly<span class="brand-light">voice</span></span>
+      </a>
+      <div class="topbar-right">
+        <span class="local-badge"><span class="status-dot"></span> LOCAL &amp; PRIVATE</span>
+        <span class="top-divider"></span>
+        <span class="version-label">VERSION <span>1.0</span></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">YOUR WORDS, SPOKEN</p>
+          <h1>Give your words<br><span>a voice.</span></h1>
+        </div>
+        <p class="intro-copy">Natural sounding speech, created privately<br class="desktop-break"> on your own device.</p>
+      </section>
+
+      <section class="workbench" aria-label="Text to speech workspace">
+        <div class="editor-column">
+          <div class="section-heading editor-heading">
+            <label for="text-input">YOUR TEXT</label>
+            <span class="shortcut-hint">Paste or type anything</span>
+          </div>
+          <div class="text-wrap">
+            <textarea id="text-input" maxlength="{{ max_text_length }}" spellcheck="true" placeholder="Start writing or paste your text here…&#10;&#10;Your text stays on this device and is never saved."></textarea>
+            <div class="text-footer">
+              <span class="privacy-note"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.7 13 3.6v3.7c0 3.1-2.1 5.7-5 7-2.9-1.3-5-3.9-5-7V3.6l5-1.9Z"/><path d="m5.7 7.8 1.5 1.5 3.2-3.2"/></svg>Text is processed locally</span>
+              <span class="char-count"><b id="char-count">0</b> / {{ max_text_length|int }} characters</span>
+            </div>
+          </div>
+          <p id="input-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <aside class="settings-column" aria-label="Speech settings">
+          <section class="setting-block">
+            <label class="section-heading" for="language-select">LANGUAGE</label>
+            <div class="select-shell"><select id="language-select" aria-label="Language"></select><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></div>
+          </section>
+
+          <section class="setting-block voice-block">
+            <div class="section-heading"><span>VOICE</span><span id="voice-count" class="muted-label"></span></div>
+            <div id="voice-list" class="voice-list" role="listbox" aria-label="Available voices"></div>
+            <div class="voice-info"><span id="voice-gender">Female voice</span><span class="preview-hint">VOICE PREVIEW</span></div>
+            <p id="language-note" class="setting-note" hidden></p>
+          </section>
+
+          <section class="setting-block speed-block">
+            <div class="section-heading"><label for="speed-range">SPEECH SPEED</label><output id="speed-value" for="speed-range">1.0×</output></div>
+            <input id="speed-range" class="range-slider" type="range" min="0.5" max="1.5" step="0.1" value="1" aria-label="Speech speed">
+            <div class="range-labels"><span>0.5×</span><span>1.5×</span></div>
+          </section>
+
+        </aside>
+      </section>
+
+      <section class="generate-section">
+        <button id="generate-button" class="generate-button" type="button" disabled>
+          <span class="generate-icon"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4.5v11l9-5.5-9-5.5Z"/></svg></span>
+          <span class="generate-label">GENERATE AUDIO</span>
+          <span class="generate-arrow" aria-hidden="true">↗</span>
+        </button>
+        <p id="engine-status" class="engine-status" role="status">Speech engine setup is pending. Your text is not uploaded or stored.</p>
+      </section>
+
+      <section id="player-section" class="player-section" aria-label="Audio player" hidden>
+        <div class="player-heading"><span class="section-heading">NOW PLAYING</span><a id="download-link" class="download-link" download="polyvoice-audio.wav" href="#"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.8v8.4m0 0 3.1-3.1M9 11.2 5.9 8.1M3.5 13.4v1.8h11v-1.8"/></svg>DOWNLOAD WAV</a></div>
+        <div class="player-card">
+          <div class="player-main-controls">
+            <button id="restart-button" class="player-icon-button" type="button" aria-label="Restart audio" title="Restart"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.8 6.2V3.7M4.8 6.2h2.6M5 6.1A6.2 6.2 0 1 1 3.9 10"/><path d="m9 7 5 3-5 3V7Z"/></svg></button>
+            <button id="play-button" class="play-button" type="button" aria-label="Play audio"><svg class="play-glyph" viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4.5 9 5.5-9 5.5v-11Z"/></svg><svg class="pause-glyph" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.2 4.5h2.7v11H6.2zM11.1 4.5h2.7v11h-2.7z"/></svg></button>
+            <div class="timeline-wrap"><div class="timeline"><span id="timeline-fill"></span><input id="seek-range" type="range" min="0" max="1000" value="0" aria-label="Audio position"></div><div class="time-row"><span id="elapsed-time">0:00</span><span id="duration-time">0:00</span></div></div>
+            <div class="volume-control"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3zM13 7a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/></svg><input id="volume-range" type="range" min="0" max="1" step="0.01" value="0.85" aria-label="Volume"></div>
+          </div>
+          <audio id="audio-element" preload="metadata"></audio>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>MADE FOR FOCUS.</span><span>POLYVOICE <i>·</i> OFFLINE BY DESIGN</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
