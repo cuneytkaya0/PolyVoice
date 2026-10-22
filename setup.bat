@@ -126,16 +126,18 @@ if errorlevel 1 goto :failed
 echo Installing the pinned Kokoro, Misaki, Flask, phonemizer, and audio dependencies...
 "%PV_PYTHON%" -m pip install -r "%PV_ROOT%requirements.txt"
 if errorlevel 1 goto :failed
-echo Checking the installed Python packages and their pinned source revisions...
-"%PV_PYTHON%" "%PV_ROOT%scripts\dependency_check.py"
-if errorlevel 1 goto :dependencies_failed
-
 echo Checking the local English pronunciation model...
 "%PV_PYTHON%" -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('en_core_web_sm') else 1)"
 if errorlevel 1 (
   "%PV_PYTHON%" -m spacy download en_core_web_sm
-  if errorlevel 1 goto :failed
+  if errorlevel 1 goto :english_model_failed
 )
+echo Verifying that the English pronunciation model loads inside .venv...
+"%PV_PYTHON%" -c "import spacy; spacy.load('en_core_web_sm')"
+if errorlevel 1 goto :english_model_failed
+echo Checking the installed Python packages, English model, and pinned source revisions...
+"%PV_PYTHON%" "%PV_ROOT%scripts\dependency_check.py"
+if errorlevel 1 goto :dependencies_failed
 
 :models
 echo [6/8] Preparing Kokoro weights and advertised voice packs...
@@ -198,6 +200,11 @@ goto :failed
 :dependencies_failed
 echo Required packages, pinned source revisions, or local eSpeak NG files are missing.
 echo Setup cannot report success until dependency verification passes.
+goto :failed
+
+:english_model_failed
+echo The English pronunciation model en_core_web_sm could not be installed or loaded in .venv.
+echo Check internet access, then run setup.bat again. The model is required for English speech.
 goto :failed
 
 :models_failed
